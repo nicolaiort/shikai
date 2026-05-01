@@ -2,6 +2,11 @@
 
 `shikai` is a Conventional Commits-based release CLI. It inspects commits since the last tag, recommends a version bump, generates a changelog, creates a release commit and annotated tag, and can push the tag to the remote.
 
+## Motivation
+
+I created this to finally get rid of a bunch of simmilar tasks/scripts sprinkled throughout almost every repo I work in and written in a wild mixture of bash, make, taskfile and JS.
+It ain't much, but it frees up time wasted by broken release scripts.
+
 ## Install
 
 Download the binary for your platform from the [latest release](https://github.com/nicolaiort/shikai/releases/latest).
