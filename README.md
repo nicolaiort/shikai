@@ -84,6 +84,7 @@ Common flags:
 - `--prerelease` and `--prerelease-id` to create a prerelease tag
 - `--changelog-path` to write the changelog somewhere other than `CHANGELOG.md`
 - `--template` to use a custom git-chglog template
+- `--push` pushes the release commit and tag to the current branch remote
 
 Example:
 

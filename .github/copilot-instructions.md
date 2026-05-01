@@ -54,9 +54,9 @@ Supporting packages are split by responsibility:
 
 - Tags are written as `vX.Y.Z`; reading the current version strips the `v` prefix
 - `--dry-run` is off by default
-- `--push` bypasses the confirmation prompt before pushing the release tag
+- `--push` bypasses the confirmation prompt before pushing the release commit and tag
 - When `--patch`, `--minor`, or `--major` is used, skip the push prompt unless `--push` is also set
-- When `--patch`, `--minor`, or `--major` is used without `--push`, do not push the tag
+- When `--patch`, `--minor`, or `--major` is used without `--push`, do not push the release commit or tag
 - `--prerelease` with `--prerelease-id alpha|beta|rc...` appends a prerelease suffix
 - An optional `.shikai.yml` in the repo root can set defaults such as `push: true`
 - `.shikai.yml` can also define hook commands under `hooks.before`, `hooks.after-changelog`, `hooks.after-tag`, and `hooks.after-done`

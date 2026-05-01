@@ -97,3 +97,34 @@ func PushTag(tag string) error {
 	}
 	return nil
 }
+
+// PushRelease pushes the current branch commit and the release tag to origin.
+func PushRelease(tag string) error {
+	branch, err := GetCurrentBranch()
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("git", "push", "origin", branch, "v"+tag)
+	_, err = cmd.Output()
+	if err != nil {
+		return fmt.Errorf("git push: %w", err)
+	}
+	return nil
+}
+
+// GetCurrentBranch returns the checked out branch name.
+func GetCurrentBranch() (string, error) {
+	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("git rev-parse: %w", err)
+	}
+
+	branch := strings.TrimSpace(string(output))
+	if branch == "HEAD" || branch == "" {
+		return "", fmt.Errorf("release push requires a checked-out branch")
+	}
+
+	return branch, nil
+}

@@ -131,12 +131,16 @@ func runRelease(cmd *cobra.Command, args []string) error {
 		var response string
 		fmt.Scanln(&response)
 		if response != "y" && response != "Y" {
-			fmt.Println("Push manually with: git push origin v" + newVersion)
+			if branch, branchErr := git.GetCurrentBranch(); branchErr == nil {
+				fmt.Printf("Push manually with: git push origin %s v%s\n", branch, newVersion)
+			} else {
+				fmt.Println("Push manually with: git push origin v" + newVersion)
+			}
 			return finishRelease()
 		}
 	}
 
-	if err := git.PushTag(newVersion); err != nil {
+	if err := git.PushRelease(newVersion); err != nil {
 		return fmt.Errorf("failed to push tag: %w", err)
 	}
 
