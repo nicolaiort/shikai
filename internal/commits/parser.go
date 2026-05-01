@@ -2,6 +2,7 @@ package commits
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -46,7 +47,7 @@ func ParseConventionalCommits(tag string) ([]Commit, error) {
 	for _, msg := range rawCommits {
 		parts := pattern.FindStringSubmatch(msg)
 		if parts == nil {
-			fmt.Printf("⚠️  Skipping non-conforming commit: %s\n", msg)
+			fmt.Fprintf(os.Stderr, "⚠️  Skipping non-conforming commit: %s\n", msg)
 			continue
 		}
 		commits = append(commits, Commit{

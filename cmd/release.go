@@ -64,7 +64,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	changelogPath := viper.GetString("changelog-path")
 	templatePath := viper.GetString("template")
 
-	changelogContent, err := changelog.Generate(newVersion, templatePath, commitList)
+	changelogContent, err := buildReleaseChangelog(newVersion, templatePath, commitList)
 	if err != nil {
 		return fmt.Errorf("failed to generate changelog: %w", err)
 	}
@@ -112,7 +112,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 		var response string
 		fmt.Scanln(&response)
 		if response != "y" && response != "Y" {
-			fmt.Println("Aborted. Push manually with: git push origin v" + newVersion)
+			fmt.Println("Push manually with: git push origin v" + newVersion)
 			return nil
 		}
 	}
@@ -146,4 +146,8 @@ func releaseVersionSelectedByFlag(cmd *cobra.Command) bool {
 
 func shouldSkipPush(versionSelectedByFlag, push bool) bool {
 	return versionSelectedByFlag && !push
+}
+
+func buildReleaseChangelog(tag string, templatePath string, commitList []commits.Commit) (string, error) {
+	return changelog.Generate(tag, templatePath, commitList)
 }

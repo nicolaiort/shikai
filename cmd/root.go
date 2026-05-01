@@ -41,4 +41,6 @@ func init() {
 	rootCmd.Flags().Bool("patch", false, "Bump patch version (x.y.Z)")
 	rootCmd.Flags().Bool("minor", false, "Bump minor version (x.Y.z)")
 	rootCmd.Flags().Bool("major", false, "Bump major version (X.y.z)")
+
+	rootCmd.AddCommand(newChangelogCmd())
 }

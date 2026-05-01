@@ -46,6 +46,12 @@ Run the CLI from the root of the git repository you want to release:
 shikai
 ```
 
+Generate the current release changelog for stdout:
+
+```bash
+shikai changelog > release-notes.md
+```
+
 Common flags:
 
 - `--patch`, `--minor`, `--major` to pick the version bump directly

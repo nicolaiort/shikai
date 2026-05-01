@@ -17,6 +17,20 @@ func GetLatestTag() (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
+// GetPreviousTag returns the most recent tag before the given tag.
+func GetPreviousTag(tag string) (string, error) {
+	if tag == "" {
+		return "", nil
+	}
+
+	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0", tag+"^")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", nil
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
 // GetCommitsSinceTag returns commit messages since the given tag (not including the tag itself).
 func GetCommitsSinceTag(tag string) ([]string, error) {
 	var args []string
