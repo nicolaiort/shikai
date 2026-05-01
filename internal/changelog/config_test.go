@@ -21,8 +21,8 @@ func TestBuildGeneratorConfigUsesTemplateOverride(t *testing.T) {
 	if cfg.Template != templatePath {
 		t.Fatalf("template = %q, want %q", cfg.Template, templatePath)
 	}
-	if cfg.Options.NextTag != "1.2.3" {
-		t.Fatalf("next tag = %q, want %q", cfg.Options.NextTag, "1.2.3")
+	if cfg.Options.NextTag != "v1.2.3" {
+		t.Fatalf("next tag = %q, want %q", cfg.Options.NextTag, "v1.2.3")
 	}
 	if cfg.Options.HeaderPattern == "" {
 		t.Fatal("expected default header pattern")
@@ -69,5 +69,21 @@ func TestBuildGeneratorConfigLoadsProjectConfig(t *testing.T) {
 	}
 	if cfg.Options.HeaderPattern != "^custom$" {
 		t.Fatalf("header pattern = %q, want %q", cfg.Options.HeaderPattern, "^custom$")
+	}
+}
+
+func TestNormalizeTagName(t *testing.T) {
+	tests := []struct {
+		tag  string
+		want string
+	}{
+		{tag: "1.2.3", want: "v1.2.3"},
+		{tag: "v1.2.3", want: "v1.2.3"},
+	}
+
+	for _, tt := range tests {
+		if got := normalizeTagName(tt.tag); got != tt.want {
+			t.Fatalf("normalizeTagName(%q) = %q, want %q", tt.tag, got, tt.want)
+		}
 	}
 }

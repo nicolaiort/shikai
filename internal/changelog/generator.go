@@ -16,9 +16,11 @@ const bundledTemplatePath = "templates/release-changelog.tpl.md"
 
 // Generate creates a changelog using the git-chglog Go library.
 func Generate(tag string, templatePath string, commitList []commits.Commit) (string, error) {
-	cfg, err := buildGeneratorConfig(tag, templatePath)
+	tagName := normalizeTagName(tag)
+
+	cfg, err := buildGeneratorConfig(tagName, templatePath)
 	if err != nil {
-		return generateSimple(tag, commitList), nil
+		return generateSimple(tagName, commitList), nil
 	}
 
 	logger := chglog.NewLogger(io.Discard, io.Discard, true, true)
@@ -26,7 +28,7 @@ func Generate(tag string, templatePath string, commitList []commits.Commit) (str
 
 	var buf bytes.Buffer
 	if err := gen.Generate(&buf, ""); err != nil {
-		return generateSimple(tag, commitList), nil
+		return generateSimple(tagName, commitList), nil
 	}
 
 	return buf.String(), nil
@@ -46,6 +48,7 @@ func UpdateFile(path string, content string) error {
 }
 
 func buildGeneratorConfig(tag string, templateOverride string) (*chglog.Config, error) {
+	tag = normalizeTagName(tag)
 	projectCfgPath := GetDefaultConfigPath()
 	projectCfg, err := loadProjectConfig(projectCfgPath)
 	if err != nil {
@@ -146,8 +149,9 @@ func mergeProjectConfig(cfg *chglog.Config, project projectConfig) {
 }
 
 func generateSimple(tag string, commitList []commits.Commit) string {
+	tag = normalizeTagName(tag)
 	var builder strings.Builder
-	builder.WriteString(fmt.Sprintf("## v%s\n\n", tag))
+	builder.WriteString(fmt.Sprintf("## %s\n\n", tag))
 
 	grouped := make(map[commits.CommitType][]commits.Commit)
 	for _, c := range commitList {
@@ -166,6 +170,13 @@ func generateSimple(tag string, commitList []commits.Commit) string {
 	}
 
 	return builder.String()
+}
+
+func normalizeTagName(tag string) string {
+	if strings.HasPrefix(tag, "v") {
+		return tag
+	}
+	return "v" + tag
 }
 
 // GetDefaultConfigPath returns the git-chglog config path.
