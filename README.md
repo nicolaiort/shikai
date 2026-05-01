@@ -28,6 +28,16 @@ chmod +x shikai-*
 
 Then move it somewhere on your `PATH`.
 
+### Helper script
+
+On Linux, macOS, or Windows, you can install the latest matching release binary with PowerShell:
+
+```powershell
+pwsh ./scripts/install-latest-release.ps1
+```
+
+By default, the script installs to `~/bin` on Linux and macOS, and `%USERPROFILE%\bin` on Windows. Pass `-InstallDir` to use a different location.
+
 ## Usage
 
 Run the CLI from the root of the git repository you want to release:
