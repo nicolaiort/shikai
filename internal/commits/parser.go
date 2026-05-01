@@ -12,15 +12,15 @@ import (
 type CommitType string
 
 const (
-	Type_feat    CommitType = "feat"
-	Type_fix     CommitType = "fix"
-	Type_docs    CommitType = "docs"
-	Type_style   CommitType = "style"
+	Type_feat     CommitType = "feat"
+	Type_fix      CommitType = "fix"
+	Type_docs     CommitType = "docs"
+	Type_style    CommitType = "style"
 	Type_refactor CommitType = "refactor"
-	Type_test    CommitType = "test"
-	Type_chore   CommitType = "chore"
-	Type_revert  CommitType = "revert"
-	Type_unknown CommitType = ""
+	Type_test     CommitType = "test"
+	Type_chore    CommitType = "chore"
+	Type_revert   CommitType = "revert"
+	Type_unknown  CommitType = ""
 )
 
 // Commit represents a parsed conventional commit.
@@ -74,13 +74,18 @@ const (
 func AnalyzeBumpType(commits []Commit) (BumpType, int) {
 	hasBreaking := false
 	hasFeat := false
+	hasPatchLevel := false
 
 	for _, c := range commits {
-		if c.IsBreaking || c.Type == Type_feat {
+		if c.IsBreaking {
 			hasBreaking = true
 		}
 		if c.Type == Type_feat {
 			hasFeat = true
+			continue
+		}
+		if c.Type == Type_fix || c.Type == Type_docs || c.Type == Type_style || c.Type == Type_refactor || c.Type == Type_test || c.Type == Type_chore || c.Type == Type_revert {
+			hasPatchLevel = true
 		}
 	}
 
@@ -89,6 +94,9 @@ func AnalyzeBumpType(commits []Commit) (BumpType, int) {
 	}
 	if hasFeat {
 		return BumpMinor, 0
+	}
+	if hasPatchLevel {
+		return BumpPatch, 0
 	}
 	return BumpPatch, 0
 }
