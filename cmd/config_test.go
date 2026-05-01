@@ -94,3 +94,28 @@ func TestLoadConfigReadsHooks(t *testing.T) {
 		t.Fatalf("hooks.after-done = %#v", got)
 	}
 }
+
+func TestLoadConfigReadsTemplate(t *testing.T) {
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, ".shikai.yml")
+	if err := os.WriteFile(configPath, []byte("template: templates/release-changelog.tpl.md\n"), 0644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	defer func() { _ = os.Chdir(oldWD) }()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+
+	v := viper.New()
+	if err := loadConfig(v); err != nil {
+		t.Fatalf("loadConfig: %v", err)
+	}
+	if got := v.GetString("template"); got != "templates/release-changelog.tpl.md" {
+		t.Fatalf("template = %q, want %q", got, "templates/release-changelog.tpl.md")
+	}
+}

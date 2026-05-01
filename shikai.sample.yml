@@ -1,6 +1,7 @@
 # Copy this file to .shikai.yml and adjust values as needed.
 
 push: true
+template: templates/release-changelog.tpl.md
 
 hooks:
   before:
