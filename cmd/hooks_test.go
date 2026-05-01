@@ -41,14 +41,14 @@ func TestPreviewReleaseHooksPrintsCommands(t *testing.T) {
 	}
 
 	stdout := captureStdout(t, func() {
-		previewReleaseHooks(hooks)
+		previewReleaseHooks("v1.2.3", hooks)
 	})
 
 	for _, want := range []string{
-		"[DRY RUN] Would run hook before anything happens: echo before",
-		"[DRY RUN] Would run hook after changelog generation: echo changelog",
-		"[DRY RUN] Would run hook after tag creation: echo tag",
-		"[DRY RUN] Would run hook after everything is done: echo done",
+		"[DRY RUN] Would run hook before anything happens (SHIKAI_TAG=v1.2.3): echo before",
+		"[DRY RUN] Would run hook after changelog generation (SHIKAI_TAG=v1.2.3): echo changelog",
+		"[DRY RUN] Would run hook after tag creation (SHIKAI_TAG=v1.2.3): echo tag",
+		"[DRY RUN] Would run hook after everything is done (SHIKAI_TAG=v1.2.3): echo done",
 	} {
 		if !strings.Contains(stdout, want) {
 			t.Fatalf("stdout missing %q:\n%s", want, stdout)
@@ -61,16 +61,21 @@ func TestRunHookPhaseRunsCommandsInOrder(t *testing.T) {
 	defer func() { executeHookCommand = oldRunner }()
 
 	var ran []string
-	executeHookCommand = func(command string) error {
+	var seenTag string
+	executeHookCommand = func(command string, tag string) error {
 		ran = append(ran, command)
+		seenTag = tag
 		return nil
 	}
 
-	if err := runHookPhase("before anything happens", []string{"one", "two"}, false); err != nil {
+	if err := runHookPhase("v1.2.3", "before anything happens", []string{"one", "two"}, false); err != nil {
 		t.Fatalf("runHookPhase: %v", err)
 	}
 	if strings.Join(ran, ",") != "one,two" {
 		t.Fatalf("commands ran in wrong order: %#v", ran)
+	}
+	if seenTag != "v1.2.3" {
+		t.Fatalf("seen tag = %q, want %q", seenTag, "v1.2.3")
 	}
 }
 

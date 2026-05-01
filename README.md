@@ -67,6 +67,7 @@ Start from `shikai.sample.yml` in the repo root and copy it to `.shikai.yml`.
 - `hooks.after-done`
 
 Hooks are skipped during `--dry-run`; the CLI prints the commands it would have run instead.
+Hook commands receive `SHIKAI_TAG` with the release tag being created.
 
 ## Usage
 

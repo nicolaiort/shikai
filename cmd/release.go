@@ -18,16 +18,6 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	dryRun := viper.GetBool("dry-run")
 	hooks := loadReleaseHooks(viper.GetViper())
 
-	if dryRun {
-		previewReleaseHooks(hooks)
-		fmt.Println("\n[DRY RUN] Skipping actual release creation")
-		return nil
-	}
-
-	if err := runHookPhase("before anything happens", hooks.before, false); err != nil {
-		return err
-	}
-
 	// 1. Find current version from latest tag
 	currentVersion, err := git.GetLatestTag()
 	if err != nil {
@@ -61,6 +51,17 @@ func runRelease(cmd *cobra.Command, args []string) error {
 		prereleaseID := viper.GetString("prerelease-id")
 		newVersion = version.AddPrerelease(newVersion, prereleaseID)
 	}
+	releaseTag := "v" + newVersion
+
+	if dryRun {
+		previewReleaseHooks(releaseTag, hooks)
+		fmt.Println("\n[DRY RUN] Skipping actual release creation")
+		return nil
+	}
+
+	if err := runHookPhase(releaseTag, "before anything happens", hooks.before, false); err != nil {
+		return err
+	}
 
 	fmt.Printf("Releasing %s → %s\n", currentVersion, newVersion)
 	if breakingChanges > 0 {
@@ -80,7 +81,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	if err := changelog.UpdateFile(changelogPath, changelogContent); err != nil {
 		return fmt.Errorf("failed to update changelog: %w", err)
 	}
-	if err := runHookPhase("after changelog generation", hooks.afterChangelog, false); err != nil {
+	if err := runHookPhase(releaseTag, "after changelog generation", hooks.afterChangelog, false); err != nil {
 		return err
 	}
 	effectiveChangelogPath := changelogPath
@@ -109,13 +110,13 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	if err := git.CreateAnnotatedTag(newVersion, changelogContent); err != nil {
 		return fmt.Errorf("failed to create tag: %w", err)
 	}
-	if err := runHookPhase("after tag creation", hooks.afterTag, false); err != nil {
+	if err := runHookPhase(releaseTag, "after tag creation", hooks.afterTag, false); err != nil {
 		return err
 	}
 
 	fmt.Printf("\n✅ Created tag: v%s\n", newVersion)
 	finishRelease := func() error {
-		if err := runHookPhase("after everything is done", hooks.afterDone, false); err != nil {
+		if err := runHookPhase(releaseTag, "after everything is done", hooks.afterDone, false); err != nil {
 			return err
 		}
 		return nil
