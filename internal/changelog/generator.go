@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	chglog "github.com/git-chglog/git-chglog"
-	"github.com/shikai/release/internal/commits"
+	"github.com/nicolaiort/shikai/internal/commits"
 )
 
 const bundledTemplatePath = "templates/release-changelog.tpl.md"

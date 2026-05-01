@@ -1,4 +1,4 @@
-module github.com/shikai/release
+module github.com/nicolaiort/shikai
 
 go 1.26.2
 

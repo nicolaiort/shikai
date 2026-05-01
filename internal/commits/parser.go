@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/shikai/release/internal/git"
+	"github.com/nicolaiort/shikai/internal/git"
 )
 
 // CommitType represents conventional commit types.

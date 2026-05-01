@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/shikai/release/internal/changelog"
-	"github.com/shikai/release/internal/commits"
-	"github.com/shikai/release/internal/git"
-	"github.com/shikai/release/internal/interactive"
-	"github.com/shikai/release/internal/manifest"
-	"github.com/shikai/release/internal/version"
+	"github.com/nicolaiort/shikai/internal/changelog"
+	"github.com/nicolaiort/shikai/internal/commits"
+	"github.com/nicolaiort/shikai/internal/git"
+	"github.com/nicolaiort/shikai/internal/interactive"
+	"github.com/nicolaiort/shikai/internal/manifest"
+	"github.com/nicolaiort/shikai/internal/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

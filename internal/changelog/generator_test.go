@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/shikai/release/internal/commits"
+	"github.com/nicolaiort/shikai/internal/commits"
 )
 
 func TestUpdateFile(t *testing.T) {

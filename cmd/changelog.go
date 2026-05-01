@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/shikai/release/internal/changelog"
-	"github.com/shikai/release/internal/commits"
-	"github.com/shikai/release/internal/git"
+	"github.com/nicolaiort/shikai/internal/changelog"
+	"github.com/nicolaiort/shikai/internal/commits"
+	"github.com/nicolaiort/shikai/internal/git"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

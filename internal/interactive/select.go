@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/shikai/release/internal/commits"
+	"github.com/nicolaiort/shikai/internal/commits"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )

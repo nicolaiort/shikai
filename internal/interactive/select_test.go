@@ -3,7 +3,7 @@ package interactive
 import (
 	"testing"
 
-	"github.com/shikai/release/internal/commits"
+	"github.com/nicolaiort/shikai/internal/commits"
 )
 
 func TestVersionChoiceDefault(t *testing.T) {
