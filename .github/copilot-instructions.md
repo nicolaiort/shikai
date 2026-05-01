@@ -43,7 +43,7 @@ Supporting packages are split by responsibility:
 - `internal/git` handles git commands
 - `internal/commits` parses commit messages and computes bump severity
 - `internal/version` bumps semver strings and prerelease suffixes
-- `internal/changelog` writes changelog output and resolves git-chglog config/template paths
+- `internal/changelog` uses the `github.com/git-chglog/git-chglog` library, resolves config/template paths, and writes changelog output
 - `internal/manifest` detects and updates manifest files
 - `internal/interactive` handles version selection prompts
 
