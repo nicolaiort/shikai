@@ -13,7 +13,7 @@
 > {{ datetime "2006-01-02" .Tag.Date }}
 
 {{ range .CommitGroups -}}
-{{ if eq .Title "Feat" }}#### 🚀 Enhancements{{ else if eq .Title "Perf" }}#### 🔥 Performance{{ else if eq .Title "Fix" }}#### 🩹 Fixes{{ else if eq .Title "Refactor" }}#### 💅 Refactors{{ else if eq .Title "Docs" }}#### 📖 Documentation{{ else if eq .Title "Build" }}#### 📦 Build{{ else if eq .Title "Chore" }}#### 🏡 Chore{{ else if eq .Title "Test" }}#### ✅ Tests{{ else if eq .Title "Style" }}#### 🎨 Styles{{ end }}
+{{ if eq .Title "Features" }}#### 🚀 Enhancements{{ else if eq .Title "Performance" }}#### 🔥 Performance{{ else if eq .Title "Bug Fixes" }}#### 🩹 Fixes{{ else if eq .Title "Refactoring" }}#### 💅 Refactors{{ else if eq .Title "Documentation" }}#### 📖 Documentation{{ else if eq .Title "Build" }}#### 📦 Build{{ else if eq .Title "Chores" }}#### 🏡 Chore{{ else if eq .Title "Tests" }}#### ✅ Tests{{ else if eq .Title "Styles" }}#### 🎨 Styles{{ end }}
 
 {{ range .Commits -}}
 * {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }}

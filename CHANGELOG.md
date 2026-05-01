@@ -23,25 +23,24 @@
 
 > 2026-05-01
 
-
-
-* **cli:** trim changelog output
-
-
+#### 🚀 Enhancements
 
 * **cli:** add changelog subcommand
+
+#### 🩹 Fixes
+
+* **cli:** trim changelog output
 
 
 <a name="v0.4.2"></a>
 ### [v0.4.2](/compare/v0.4.1...v0.4.2)
 
 > 2026-05-01
-
-
+#### 🩹 Fixes
 
 * **ci:** stage release assets before upload
 
-
+#### 🏡 Chore
 
 * **ci:** bump github actions versions
 * **release:** prepare v0.4.2
@@ -51,34 +50,32 @@
 ### [v0.4.1](/compare/v0.4.0...v0.4.1)
 
 > 2026-05-01
+#### 🚀 Enhancements
 
+* **scripts:** add release installer
 
+#### 🩹 Fixes
 
 * **ci:** checkout repo in release job
 * **scripts:** use bash installer
 
-
+#### 🏡 Chore
 
 * **release:** prepare v0.4.1
-
-
-
-* **scripts:** add release installer
 
 
 <a name="v0.4.0"></a>
 ### [v0.4.0](/compare/v0.3.1...v0.4.0)
 
 > 2026-05-01
-
-
-
-* **release:** prepare v0.4.0
-
-
+#### 📖 Documentation
 
 * add motivation section to README
 * add initial README with installation and usage instructions
+
+#### 🏡 Chore
+
+* **release:** prepare v0.4.0
 
 
 <a name="v0.3.1"></a>
