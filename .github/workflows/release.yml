@@ -76,7 +76,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          gh release create "${TAG}" --title "${TAG}" --generate-notes
+          chmod +x ./dist/linux-amd64/shikai
+          ./dist/linux-amd64/shikai changelog > release-notes.md
+
+          gh release create "${TAG}" --title "${TAG}" --notes-file release-notes.md
 
           staging_dir="$(mktemp -d)"
           while IFS= read -r -d '' file; do
