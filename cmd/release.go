@@ -41,6 +41,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("interactive selection: %w", err)
 	}
+	versionSelectedByFlag := releaseVersionSelectedByFlag(cmd)
 
 	newVersion := version.Bump(currentVersion, selectedBump)
 
@@ -101,8 +102,12 @@ func runRelease(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("\n✅ Created tag: v%s\n", newVersion)
 
-	// 11. Prompt for push
-	if !viper.GetBool("push") {
+	// 11. Push or prompt for push
+	pushEnabled := viper.GetBool("push")
+	if shouldSkipPush(versionSelectedByFlag, pushEnabled) {
+		return nil
+	}
+	if !pushEnabled {
 		fmt.Print("\nPush tag to remote? [y/N] ")
 		var response string
 		fmt.Scanln(&response)
@@ -133,4 +138,12 @@ func effectiveChangelogPath(path string) string {
 		return "CHANGELOG.md"
 	}
 	return path
+}
+
+func releaseVersionSelectedByFlag(cmd *cobra.Command) bool {
+	return cmd.Flags().Changed("patch") || cmd.Flags().Changed("minor") || cmd.Flags().Changed("major")
+}
+
+func shouldSkipPush(versionSelectedByFlag, push bool) bool {
+	return versionSelectedByFlag && !push
 }

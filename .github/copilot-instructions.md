@@ -52,6 +52,8 @@ Supporting packages are split by responsibility:
 - Tags are written as `vX.Y.Z`; reading the current version strips the `v` prefix
 - `--dry-run` is off by default
 - `--push` bypasses the confirmation prompt before pushing the release tag
+- When `--patch`, `--minor`, or `--major` is used, skip the push prompt unless `--push` is also set
+- When `--patch`, `--minor`, or `--major` is used without `--push`, do not push the tag
 - `--prerelease` with `--prerelease-id alpha|beta|rc...` appends a prerelease suffix
 - The version chooser is an arrow-key select prompt and should fall back to the recommended bump when stdin/stdout are not terminals
 - Invoke the CLI as `release`; there is no nested `release release` subcommand

@@ -41,3 +41,25 @@ func TestEffectiveChangelogPath(t *testing.T) {
 		})
 	}
 }
+
+func TestShouldSkipPush(t *testing.T) {
+	tests := []struct {
+		name                  string
+		versionSelectedByFlag bool
+		push                  bool
+		want                  bool
+	}{
+		{name: "interactive and no push", versionSelectedByFlag: false, push: false, want: false},
+		{name: "interactive and push", versionSelectedByFlag: false, push: true, want: false},
+		{name: "flag-selected and no push", versionSelectedByFlag: true, push: false, want: true},
+		{name: "flag-selected and push", versionSelectedByFlag: true, push: true, want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := shouldSkipPush(tt.versionSelectedByFlag, tt.push); got != tt.want {
+				t.Fatalf("shouldSkipPush(%v, %v) = %v, want %v", tt.versionSelectedByFlag, tt.push, got, tt.want)
+			}
+		})
+	}
+}
