@@ -4,7 +4,7 @@ tasks:
   build:
     desc: Build shikai for the current platform
     cmds:
-      - sh: |
+      - cmd: |
           set -euo pipefail
           os="$(go env GOOS)"
           arch="$(go env GOARCH)"
