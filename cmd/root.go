@@ -6,7 +6,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "release",
+	Use:   "shikai",
 	Short: "Release management tool with Conventional Commits",
 	Long:  `A CLI tool for managing releases. Analyzes commits since the last tag, suggests a semver bump, generates a changelog, and creates an annotated tag.`,
 	Args:  cobra.NoArgs,
