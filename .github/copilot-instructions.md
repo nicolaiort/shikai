@@ -7,6 +7,8 @@ Use Conventional Commits for all suggested or written commits.
 - Format: `<type>(<scope>): <description>`
 - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `revert`
 - Keep the description imperative, lowercase, and without a trailing period
+- Group related commits with the same scope, or omit the scope if not applicable
+- Don't just plainly commit all files since the last commit at once; instead, group changes into logical commits with clear messages
 
 Examples:
 - `feat(release): add prerelease flag`
