@@ -2,10 +2,12 @@ package interactive
 
 import (
 	"fmt"
-	"strings"
+	"os"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/shikai/release/internal/commits"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 // SelectVersion prompts the user to select a version bump or uses flag.
@@ -20,25 +22,31 @@ func SelectVersion(cmd *cobra.Command, recommended commits.BumpType) (string, er
 		return "patch", nil
 	}
 
-	fmt.Printf("\n📊 Recommended bump: %s\n", recommended)
-	fmt.Println("Select version bump:")
-	fmt.Println("  [M]ajor  - Breaking changes")
-	fmt.Println("  [m]inor  - New features (backward compatible)")
-	fmt.Println("  [p]atch  - Bug fixes")
+	choices := versionChoiceOptions()
+	defaultChoice := versionChoiceDefault(recommended)
+	if !term.IsTerminal(int(os.Stdin.Fd())) || !term.IsTerminal(int(os.Stdout.Fd())) {
+		return defaultChoice, nil
+	}
 
 	var choice string
-	for {
-		fmt.Print("\nChoice [M/m/p]: ")
-		fmt.Scanln(&choice)
-		switch strings.ToLower(choice) {
-		case "m":
-			return "major", nil
-		case "":
-			return string(recommended), nil
-		case "p":
-			return "patch", nil
-		default:
-			fmt.Println("Invalid selection")
-		}
+	prompt := &survey.Select{
+		Message: "Select version bump",
+		Options: choices,
+		Default: defaultChoice,
 	}
+	if err := survey.AskOne(prompt, &choice); err != nil {
+		return "", fmt.Errorf("select version bump: %w", err)
+	}
+	return choice, nil
+}
+
+func versionChoiceOptions() []string {
+	return []string{"major", "minor", "patch"}
+}
+
+func versionChoiceDefault(recommended commits.BumpType) string {
+	if recommended == "" {
+		return "patch"
+	}
+	return string(recommended)
 }
