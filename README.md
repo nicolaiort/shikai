@@ -9,6 +9,12 @@ It ain't much, but it frees up time wasted by broken release scripts.
 
 ## Install
 
+Install from source with Go:
+
+```bash
+go install github.com/shikai/release@latest
+```
+
 Download the binary for your platform from the [latest release](https://github.com/nicolaiort/shikai/releases/latest).
 
 Choose the asset that matches your OS and architecture:

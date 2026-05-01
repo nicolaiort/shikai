@@ -18,6 +18,7 @@ Examples:
 ## Build, Test, and Lint Commands
 
 - `go build -o release .` — build the CLI binary
+- `go install github.com/shikai/release@latest` — install the CLI from source
 - `task build` — build the CLI binary for the current platform
 - `go test ./...` — run the full test suite
 - `go test ./e2e` — run the CLI smoke/e2e tests
