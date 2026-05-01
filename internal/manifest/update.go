@@ -2,13 +2,10 @@ package manifest
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
-// Supported manifest types
 var manifestTypes = []string{
 	"package.json",
 	"Cargo.toml",
@@ -29,29 +26,29 @@ func GetManifestFiles() []string {
 // UpdateAll detects and updates all manifest files in the repository.
 func UpdateAll(version string) error {
 	detected := detectManifests()
-	manifestFiles = detected
-
-	if len(detected) > 1 {
-		return fmt.Errorf("multiple manifest files detected: %v\nPlease configure which one to update", detected)
+	updatable := make([]string, 0, len(detected))
+	for _, path := range detected {
+		if isUpdatableManifest(path) {
+			updatable = append(updatable, path)
+			continue
+		}
+		fmt.Printf("⚠️  Skipping unsupported manifest: %s\n", path)
 	}
-	if len(detected) == 0 {
+	manifestFiles = updatable
+
+	if len(updatable) > 1 {
+		return fmt.Errorf("multiple manifest files detected: %v\nPlease configure which one to update", updatable)
+	}
+	if len(updatable) == 0 {
 		return nil // No manifest to update
 	}
 
-	path := detected[0]
-	ext := filepath.Ext(path)
-
-	switch ext {
-	case ".json":
+	path := updatable[0]
+	switch path {
+	case "package.json":
 		return updatePackageJSON(path, version)
-	case ".toml":
-		return updateTOML(path, version)
-	case ".yaml", ".yml":
-		return updateYAML(path, version)
-	case ".gradle":
-		return updateGradle(path, version)
-	case ".xml":
-		return updateXML(path, version)
+	case "Cargo.toml":
+		return updateCargoToml(path, version)
 	default:
 		return fmt.Errorf("unsupported manifest type: %s", path)
 	}
@@ -84,12 +81,20 @@ func updatePackageJSON(path string, version string) error {
 	return os.WriteFile(path, out, 0644)
 }
 
-func updateTOML(path string, version string) error {
+func isUpdatableManifest(path string) bool {
+	switch path {
+	case "package.json", "Cargo.toml":
+		return true
+	default:
+		return false
+	}
+}
+
+func updateCargoToml(path string, version string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
-	// Simple line-based replacement for [package] section
 	content := string(data)
 	lines := ""
 	inPackage := false
@@ -105,18 +110,6 @@ func updateTOML(path string, version string) error {
 		lines += line + "\n"
 	}
 	return os.WriteFile(path, []byte(lines), 0644)
-}
-
-func updateYAML(path string, version string) error {
-	return errors.New("YAML manifest update not yet implemented")
-}
-
-func updateGradle(path string, version string) error {
-	return errors.New("Gradle manifest update not yet implemented")
-}
-
-func updateXML(path string, version string) error {
-	return errors.New("XML manifest update not yet implemented")
 }
 
 func splitLines(s string) []string {
