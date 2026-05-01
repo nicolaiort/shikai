@@ -1,3 +1,17 @@
+## [0.1.1] - 2026-05-01
+### Bug Fixes
+- commit release artifacts
+### Chores
+- add initial changelog file with version 0.1.0 details
+
+
+## [0.1.1] - 2026-05-01
+### Bug Fixes
+- commit release artifacts
+### Chores
+- add initial changelog file with version 0.1.0 details
+
+
 ## [0.1.0] - 2026-05-01
 ### Bug Fixes
 - use git-chglog library
