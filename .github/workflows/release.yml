@@ -78,6 +78,7 @@ jobs:
 
           gh release create "${TAG}" --title "${TAG}" --generate-notes
 
+          staging_dir="$(mktemp -d)"
           while IFS= read -r -d '' file; do
             dir="$(basename "$(dirname "${file}")")"
             goos="${dir%-*}"
@@ -86,5 +87,7 @@ jobs:
             if [[ "${file}" == *.exe ]]; then
               asset="${asset}.exe"
             fi
-            gh release upload "${TAG}" "${file}#${asset}" --clobber
+            cp "${file}" "${staging_dir}/${asset}"
           done < <(find dist -type f \( -name 'shikai' -o -name 'shikai.exe' \) -print0)
+
+          gh release upload "${TAG}" "${staging_dir}"/* --clobber
