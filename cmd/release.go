@@ -35,13 +35,13 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to get latest tag: %w", err)
 	}
-	if currentVersion == "" {
+	currentVersion, commitBaseRef := normalizeReleaseRefs(currentVersion)
+	if commitBaseRef == "" {
 		fmt.Println("No existing tags found. Starting from v0.0.0")
-		currentVersion = "0.0.0"
 	}
 
 	// 2. Get commits since last tag
-	commitList, err := commits.ParseConventionalCommits(currentVersion)
+	commitList, err := commits.ParseConventionalCommits(commitBaseRef)
 	if err != nil {
 		return fmt.Errorf("failed to parse commits: %w", err)
 	}
@@ -122,4 +122,11 @@ func runRelease(cmd *cobra.Command, args []string) error {
 
 	fmt.Println("🚀 Pushed to remote")
 	return nil
+}
+
+func normalizeReleaseRefs(latestTag string) (string, string) {
+	if latestTag == "" {
+		return "0.0.0", ""
+	}
+	return latestTag, latestTag
 }
