@@ -13,20 +13,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var releaseCmd = &cobra.Command{
-	Use:   "release",
-	Short: "Create a new release",
-	RunE:  runRelease,
-}
-
-func init() {
-	rootCmd.AddCommand(releaseCmd)
-
-	releaseCmd.Flags().Bool("patch", false, "Bump patch version (x.y.Z)")
-	releaseCmd.Flags().Bool("minor", false, "Bump minor version (x.Y.z)")
-	releaseCmd.Flags().Bool("major", false, "Bump major version (X.y.z)")
-}
-
 func runRelease(cmd *cobra.Command, args []string) error {
 	dryRun := viper.GetBool("dry-run")
 

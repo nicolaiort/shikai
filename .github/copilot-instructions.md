@@ -27,7 +27,7 @@ No dedicated lint command is currently defined in the repo.
 
 ## Architecture Overview
 
-The CLI entrypoint is `main.go`, which calls `cmd.Execute()`. `cmd/root.go` defines global flags with cobra/viper, and `cmd/release.go` owns the release workflow.
+The CLI entrypoint is `main.go`, which calls `cmd.Execute()`. `cmd/root.go` defines the root `release` command, global flags with cobra/viper, and wires the release workflow directly. `cmd/release.go` owns the release logic.
 
 The release flow is:
 1. Read the latest git tag and strip any leading `v`
@@ -54,6 +54,7 @@ Supporting packages are split by responsibility:
 - `--push` bypasses the confirmation prompt before pushing the release tag
 - `--prerelease` with `--prerelease-id alpha|beta|rc...` appends a prerelease suffix
 - The version chooser is an arrow-key select prompt and should fall back to the recommended bump when stdin/stdout are not terminals
+- Invoke the CLI as `release`; there is no nested `release release` subcommand
 - The repo is expected to be run from the current working directory
 - Non-conforming commits are ignored rather than coerced
 - If more than one manifest is detected, the command should fail and ask for configuration instead of guessing

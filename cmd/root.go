@@ -9,6 +9,8 @@ var rootCmd = &cobra.Command{
 	Use:   "release",
 	Short: "Release management tool with Conventional Commits",
 	Long:  `A CLI tool for managing releases. Analyzes commits since the last tag, suggests a semver bump, generates a changelog, and creates an annotated tag.`,
+	Args:  cobra.NoArgs,
+	RunE:  runRelease,
 }
 
 func Execute() error {
@@ -16,6 +18,8 @@ func Execute() error {
 }
 
 func init() {
+	rootCmd.SilenceUsage = true
+
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Show what would happen without making changes")
 	viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
 
@@ -33,4 +37,8 @@ func init() {
 
 	rootCmd.PersistentFlags().String("prerelease-id", "alpha", "Prerelease identifier (e.g., alpha, beta, rc)")
 	viper.BindPFlag("prerelease-id", rootCmd.PersistentFlags().Lookup("prerelease-id"))
+
+	rootCmd.Flags().Bool("patch", false, "Bump patch version (x.y.Z)")
+	rootCmd.Flags().Bool("minor", false, "Bump minor version (x.Y.z)")
+	rootCmd.Flags().Bool("major", false, "Bump major version (X.y.z)")
 }
