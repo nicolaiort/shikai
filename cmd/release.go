@@ -72,6 +72,10 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	if err := changelog.UpdateFile(changelogPath, changelogContent); err != nil {
 		return fmt.Errorf("failed to update changelog: %w", err)
 	}
+	effectiveChangelogPath := changelogPath
+	if effectiveChangelogPath == "" {
+		effectiveChangelogPath = "CHANGELOG.md"
+	}
 
 	// 7. Update manifest files
 	if err := manifest.UpdateAll(newVersion); err != nil {
@@ -79,7 +83,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	}
 
 	// 8. Stage changes
-	files := []string{changelogPath}
+	files := []string{effectiveChangelogPath}
 	files = append(files, manifest.GetManifestFiles()...)
 	if err := git.StageFiles(files...); err != nil {
 		return fmt.Errorf("failed to stage files: %w", err)
@@ -122,4 +126,11 @@ func normalizeReleaseRefs(latestTag string) (string, string) {
 	}
 	version := strings.TrimPrefix(latestTag, "v")
 	return version, latestTag
+}
+
+func effectiveChangelogPath(path string) string {
+	if path == "" {
+		return "CHANGELOG.md"
+	}
+	return path
 }

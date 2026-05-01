@@ -22,3 +22,22 @@ func TestNormalizeReleaseRefs(t *testing.T) {
 		})
 	}
 }
+
+func TestEffectiveChangelogPath(t *testing.T) {
+	tests := []struct {
+		name string
+		path string
+		want string
+	}{
+		{name: "default path", path: "", want: "CHANGELOG.md"},
+		{name: "custom path", path: "docs/CHANGELOG.md", want: "docs/CHANGELOG.md"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := effectiveChangelogPath(tt.path); got != tt.want {
+				t.Fatalf("effectiveChangelogPath(%q) = %q, want %q", tt.path, got, tt.want)
+			}
+		})
+	}
+}
