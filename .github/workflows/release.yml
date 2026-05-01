@@ -64,6 +64,9 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - uses: actions/download-artifact@v8.0.1
         with:
