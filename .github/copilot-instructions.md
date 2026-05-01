@@ -18,6 +18,7 @@ Examples:
 ## Build, Test, and Lint Commands
 
 - `go build -o release .` — build the CLI binary
+- `task build` — build the CLI binary for the current platform
 - `go test ./...` — run the full test suite
 - `go test ./e2e` — run the CLI smoke/e2e tests
 - `go test ./internal/commits -run TestCommitPatternMatchesConventionalCommits` — run one commit-parser test
@@ -47,6 +48,7 @@ Supporting packages are split by responsibility:
 - `internal/changelog` uses the `github.com/git-chglog/git-chglog` library, resolves config/template paths, and writes changelog output
 - `internal/manifest` detects and updates manifest files
 - `internal/interactive` handles version selection prompts
+- `.github/workflows/release.yml` builds tagged binaries for linux/windows/darwin on amd64 and arm64, then publishes a GitHub release
 
 ## Conventions
 

@@ -1,0 +1,88 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: build ${{ matrix.goos }}-${{ matrix.goarch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: windows
+            goarch: amd64
+          - goos: windows
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+    env:
+      CGO_ENABLED: 0
+      GOOS: ${{ matrix.goos }}
+      GOARCH: ${{ matrix.goarch }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build binary
+        run: |
+          set -euo pipefail
+          outdir="dist/${GOOS}-${GOARCH}"
+          mkdir -p "${outdir}"
+
+          binary_name="shikai"
+          if [ "${GOOS}" = "windows" ]; then
+            binary_name="${binary_name}.exe"
+          fi
+
+          go build -trimpath -ldflags="-s -w" -o "${outdir}/${binary_name}" .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.goos }}-${{ matrix.goarch }}
+          path: dist/${{ matrix.goos }}-${{ matrix.goarch }}/
+          if-no-files-found: error
+
+  release:
+    name: create github release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Create release and upload assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          gh release create "${TAG}" --title "${TAG}" --generate-notes
+
+          while IFS= read -r -d '' file; do
+            dir="$(basename "$(dirname "${file}")")"
+            goos="${dir%-*}"
+            goarch="${dir#*-}"
+            asset="shikai-${goos}-${goarch}"
+            if [[ "${file}" == *.exe ]]; then
+              asset="${asset}.exe"
+            fi
+            gh release upload "${TAG}" "${file}#${asset}" --clobber
+          done < <(find dist -type f \( -name 'shikai' -o -name 'shikai.exe' \) -print0)

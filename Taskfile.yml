@@ -1,0 +1,17 @@
+version: "3"
+
+tasks:
+  build:
+    desc: Build shikai for the current platform
+    cmds:
+      - sh: |
+          set -euo pipefail
+          os="$(go env GOOS)"
+          arch="$(go env GOARCH)"
+          outdir="dist/${os}-${arch}"
+          binary_name="shikai"
+          if [ "${os}" = "windows" ]; then
+            binary_name="${binary_name}.exe"
+          fi
+          mkdir -p "${outdir}"
+          CGO_ENABLED=0 GOOS="${os}" GOARCH="${arch}" go build -trimpath -ldflags="-s -w" -o "${outdir}/${binary_name}" .
