@@ -19,6 +19,9 @@ func Execute() error {
 
 func init() {
 	rootCmd.SilenceUsage = true
+	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		return loadConfig(viper.GetViper())
+	}
 
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Show what would happen without making changes")
 	viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))

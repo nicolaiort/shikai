@@ -38,6 +38,16 @@ bash ./scripts/install-latest-release.sh
 
 By default, the script installs to `~/bin`. Pass `INSTALL_DIR=/some/path` or a path argument to use a different location.
 
+### Repository config
+
+You can add an optional `.shikai.yml` file in the repository root to set defaults such as always pushing tags:
+
+```yaml
+push: true
+```
+
+Any supported settings can be added later without changing the CLI shape.
+
 ## Usage
 
 Run the CLI from the root of the git repository you want to release:
