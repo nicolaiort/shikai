@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// GetLatestTag returns the most recent git tag, stripping the 'v' prefix.
+// GetLatestTag returns the most recent git tag as-is.
 func GetLatestTag() (string, error) {
 	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 	output, err := cmd.Output()
@@ -14,12 +14,7 @@ func GetLatestTag() (string, error) {
 		// No tags found
 		return "", nil
 	}
-	tag := strings.TrimSpace(string(output))
-	// Strip 'v' prefix
-	if strings.HasPrefix(tag, "v") {
-		tag = tag[1:]
-	}
-	return tag, nil
+	return strings.TrimSpace(string(output)), nil
 }
 
 // GetCommitsSinceTag returns commit messages since the given tag (not including the tag itself).
@@ -56,6 +51,15 @@ func StageFiles(paths ...string) error {
 	cmd := exec.Command("git", args...)
 	if _, err := cmd.Output(); err != nil {
 		return fmt.Errorf("git add: %w", err)
+	}
+	return nil
+}
+
+// CommitChanges creates a git commit from the staged changes.
+func CommitChanges(message string) error {
+	cmd := exec.Command("git", "commit", "-m", message)
+	if _, err := cmd.Output(); err != nil {
+		return fmt.Errorf("git commit: %w", err)
 	}
 	return nil
 }

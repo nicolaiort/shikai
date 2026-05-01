@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/shikai/release/internal/changelog"
 	"github.com/shikai/release/internal/commits"
@@ -84,14 +85,19 @@ func runRelease(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to stage files: %w", err)
 	}
 
-	// 9. Create annotated tag
+	// 9. Commit release changes
+	if err := git.CommitChanges(fmt.Sprintf("chore(release): prepare v%s", newVersion)); err != nil {
+		return fmt.Errorf("failed to commit release changes: %w", err)
+	}
+
+	// 10. Create annotated tag
 	if err := git.CreateAnnotatedTag(newVersion, changelogContent); err != nil {
 		return fmt.Errorf("failed to create tag: %w", err)
 	}
 
 	fmt.Printf("\n✅ Created tag: v%s\n", newVersion)
 
-	// 10. Prompt for push
+	// 11. Prompt for push
 	if !viper.GetBool("push") {
 		fmt.Print("\nPush tag to remote? [y/N] ")
 		var response string
@@ -114,5 +120,6 @@ func normalizeReleaseRefs(latestTag string) (string, string) {
 	if latestTag == "" {
 		return "0.0.0", ""
 	}
-	return latestTag, latestTag
+	version := strings.TrimPrefix(latestTag, "v")
+	return version, latestTag
 }

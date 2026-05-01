@@ -10,7 +10,7 @@ func TestNormalizeReleaseRefs(t *testing.T) {
 		wantRef     string
 	}{
 		{name: "no tags", latestTag: "", wantVersion: "0.0.0", wantRef: ""},
-		{name: "tag present", latestTag: "1.2.3", wantVersion: "1.2.3", wantRef: "1.2.3"},
+		{name: "tag present", latestTag: "v1.2.3", wantVersion: "1.2.3", wantRef: "v1.2.3"},
 	}
 
 	for _, tt := range tests {

@@ -37,7 +37,7 @@ The release flow is:
 5. Let the user confirm or override the bump interactively, unless `--patch`, `--minor`, or `--major` is set
 6. Generate a changelog with git-chglog, falling back to a simple internal generator
 7. Update the manifest file version
-8. Stage changes, create an annotated tag, and optionally push after confirmation
+8. Stage changes, create a release commit, create an annotated tag, and optionally push after confirmation
 
 Supporting packages are split by responsibility:
 - `internal/git` handles git commands
