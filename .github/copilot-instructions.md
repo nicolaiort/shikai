@@ -59,6 +59,7 @@ Supporting packages are split by responsibility:
 - When `--patch`, `--minor`, or `--major` is used without `--push`, do not push the tag
 - `--prerelease` with `--prerelease-id alpha|beta|rc...` appends a prerelease suffix
 - An optional `.shikai.yml` in the repo root can set defaults such as `push: true`
+- `.shikai.yml` can also define hook commands under `hooks.before`, `hooks.after-changelog`, `hooks.after-tag`, and `hooks.after-done`
 - The version chooser is an arrow-key select prompt and should fall back to the recommended bump when stdin/stdout are not terminals
 - Invoke the CLI as `release`; there is no nested `release release` subcommand
 - `shikai changelog` prints the current release notes body to stdout for reuse in release tooling

@@ -1,0 +1,13 @@
+# Copy this file to .shikai.yml and adjust values as needed.
+
+push: true
+
+hooks:
+  before:
+    - echo "starting release"
+  after-changelog:
+    - echo "changelog generated"
+  after-tag:
+    - echo "tag created"
+  after-done:
+    - echo "release finished"

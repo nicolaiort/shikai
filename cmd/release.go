@@ -16,6 +16,17 @@ import (
 
 func runRelease(cmd *cobra.Command, args []string) error {
 	dryRun := viper.GetBool("dry-run")
+	hooks := loadReleaseHooks(viper.GetViper())
+
+	if dryRun {
+		previewReleaseHooks(hooks)
+		fmt.Println("\n[DRY RUN] Skipping actual release creation")
+		return nil
+	}
+
+	if err := runHookPhase("before anything happens", hooks.before, false); err != nil {
+		return err
+	}
 
 	// 1. Find current version from latest tag
 	currentVersion, err := git.GetLatestTag()
@@ -55,10 +66,6 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	if breakingChanges > 0 {
 		fmt.Printf("⚠️  Contains %d breaking change(s)\n", breakingChanges)
 	}
-	if dryRun {
-		fmt.Println("\n[DRY RUN] Skipping actual release creation")
-		return nil
-	}
 
 	// 5. Generate changelog
 	changelogPath := viper.GetString("changelog-path")
@@ -72,6 +79,9 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	// 6. Update CHANGELOG.md
 	if err := changelog.UpdateFile(changelogPath, changelogContent); err != nil {
 		return fmt.Errorf("failed to update changelog: %w", err)
+	}
+	if err := runHookPhase("after changelog generation", hooks.afterChangelog, false); err != nil {
+		return err
 	}
 	effectiveChangelogPath := changelogPath
 	if effectiveChangelogPath == "" {
@@ -99,13 +109,22 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	if err := git.CreateAnnotatedTag(newVersion, changelogContent); err != nil {
 		return fmt.Errorf("failed to create tag: %w", err)
 	}
+	if err := runHookPhase("after tag creation", hooks.afterTag, false); err != nil {
+		return err
+	}
 
 	fmt.Printf("\n✅ Created tag: v%s\n", newVersion)
+	finishRelease := func() error {
+		if err := runHookPhase("after everything is done", hooks.afterDone, false); err != nil {
+			return err
+		}
+		return nil
+	}
 
 	// 11. Push or prompt for push
 	pushEnabled := viper.GetBool("push")
 	if shouldSkipPush(versionSelectedByFlag, pushEnabled) {
-		return nil
+		return finishRelease()
 	}
 	if !pushEnabled {
 		fmt.Print("\nPush tag to remote? [y/N] ")
@@ -113,7 +132,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 		fmt.Scanln(&response)
 		if response != "y" && response != "Y" {
 			fmt.Println("Push manually with: git push origin v" + newVersion)
-			return nil
+			return finishRelease()
 		}
 	}
 
@@ -122,7 +141,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println("🚀 Pushed to remote")
-	return nil
+	return finishRelease()
 }
 
 func normalizeReleaseRefs(latestTag string) (string, string) {

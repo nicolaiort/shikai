@@ -38,6 +38,8 @@ bash ./scripts/install-latest-release.sh
 
 By default, the script installs to `~/bin`. Pass `INSTALL_DIR=/some/path` or a path argument to use a different location.
 
+## Configuration
+
 ### Repository config
 
 You can add an optional `.shikai.yml` file in the repository root to set defaults such as always pushing tags:
@@ -47,6 +49,18 @@ push: true
 ```
 
 Any supported settings can be added later without changing the CLI shape.
+Start from `shikai.sample.yml` in the repo root and copy it to `.shikai.yml`.
+
+### Hooks
+
+`shikai` can run shell hooks from `.shikai.yml`:
+
+- `hooks.before`
+- `hooks.after-changelog`
+- `hooks.after-tag`
+- `hooks.after-done`
+
+Hooks are skipped during `--dry-run`; the CLI prints the commands it would have run instead.
 
 ## Usage
 

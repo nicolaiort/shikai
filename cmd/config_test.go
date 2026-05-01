@@ -50,3 +50,47 @@ func TestLoadConfigReadsPushSetting(t *testing.T) {
 		t.Fatal("expected push to be enabled from config")
 	}
 }
+
+func TestLoadConfigReadsHooks(t *testing.T) {
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, ".shikai.yml")
+	yaml := `hooks:
+  before:
+    - echo before
+  after-changelog:
+    - echo changelog
+  after-tag:
+    - echo tag
+  after-done:
+    - echo done
+`
+	if err := os.WriteFile(configPath, []byte(yaml), 0644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	defer func() { _ = os.Chdir(oldWD) }()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+
+	v := viper.New()
+	if err := loadConfig(v); err != nil {
+		t.Fatalf("loadConfig: %v", err)
+	}
+	if got := v.GetStringSlice("hooks.before"); len(got) != 1 || got[0] != "echo before" {
+		t.Fatalf("hooks.before = %#v", got)
+	}
+	if got := v.GetStringSlice("hooks.after-changelog"); len(got) != 1 || got[0] != "echo changelog" {
+		t.Fatalf("hooks.after-changelog = %#v", got)
+	}
+	if got := v.GetStringSlice("hooks.after-tag"); len(got) != 1 || got[0] != "echo tag" {
+		t.Fatalf("hooks.after-tag = %#v", got)
+	}
+	if got := v.GetStringSlice("hooks.after-done"); len(got) != 1 || got[0] != "echo done" {
+		t.Fatalf("hooks.after-done = %#v", got)
+	}
+}
