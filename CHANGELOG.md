@@ -1,3 +1,89 @@
+# Changelog
+
+## Version History
+
+* [0.1.3](#0.1.3)
+* [v0.1.2](#v0.1.2)
+* [v0.1.1](#v0.1.1)
+* [v0.1.0](#v0.1.0)
+
+## Changes
+
+<a name="0.1.3"></a>
+### [0.1.3](/compare/v0.1.2...0.1.3)
+
+> 2026-05-01
+
+
+
+* **changelog:** restructure release changelog template for improved clarity
+
+
+<a name="v0.1.2"></a>
+### [v0.1.2](/compare/v0.1.1...v0.1.2)
+
+> 2026-05-01
+
+
+
+* **cli:** stage default changelog path
+
+
+
+* **release:** prepare v0.1.2
+
+
+
+* **cli:** update command usage from 'release' to 'shikai'
+
+
+<a name="v0.1.1"></a>
+### [v0.1.1](/compare/v0.1.0...v0.1.1)
+
+> 2026-05-01
+
+
+
+* **cli:** commit release artifacts
+
+
+
+* **changelog:** add initial changelog file with version 0.1.0 details
+* **release:** prepare v0.1.1
+
+
+<a name="v0.1.0"></a>
+### v0.1.0
+
+> 2026-05-01
+
+
+
+* **changelog:** use git-chglog library
+* **manifest:** skip unsupported manifest types
+* **release:** correct bump logic and add tests
+
+
+
+* add copilot-instructions.md
+* **copilot:** update commit guidance
+* **copilot:** update changelog instructions
+* **copilot:** enhance commit guidelines for logical grouping and clarity
+* **copilot:** add repository instructions
+
+
+
+* add changelog template and configuration files
+* initial release CLI implementation
+* **interactive:** add arrow selector
+* **release:** normalize release references and add tests for version handling
+
+
+
+* **cli:** make release the root command
+
+
+
 ## [0.1.2] - 2026-05-01
 ### Bug Fixes
 - stage default changelog path
