@@ -1,3 +1,10 @@
+## [0.1.2] - 2026-05-01
+### Bug Fixes
+- stage default changelog path
+### Refactoring
+- update command usage from 'release' to 'shikai'
+
+
 ## [0.1.1] - 2026-05-01
 ### Bug Fixes
 - commit release artifacts
