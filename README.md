@@ -30,13 +30,13 @@ Then move it somewhere on your `PATH`.
 
 ### Helper script
 
-On Linux, macOS, or Windows, you can install the latest matching release binary with PowerShell:
+On Linux and macOS, you can install the latest matching release binary with Bash:
 
-```powershell
-pwsh ./scripts/install-latest-release.ps1
+```bash
+bash ./scripts/install-latest-release.sh
 ```
 
-By default, the script installs to `~/bin` on Linux and macOS, and `%USERPROFILE%\bin` on Windows. Pass `-InstallDir` to use a different location.
+By default, the script installs to `~/bin`. Pass `INSTALL_DIR=/some/path` or a path argument to use a different location.
 
 ## Usage
 
