@@ -19,6 +19,7 @@ Examples:
 
 - `go build -o release .` — build the CLI binary
 - `go test ./...` — run the full test suite
+- `go test ./e2e` — run the CLI smoke/e2e tests
 - `go test ./internal/commits -run TestCommitPatternMatchesConventionalCommits` — run one commit-parser test
 - `go test ./internal/version -run TestBump` — run version bump tests
 - `go test ./internal/changelog -run TestGenerateSimple` — run changelog tests
