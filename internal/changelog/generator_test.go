@@ -85,6 +85,24 @@ func TestGenerateSimpleWithBreaking(t *testing.T) {
 	}
 }
 
+func TestGenerateReleaseNotesStripsHeaders(t *testing.T) {
+	commitList := []commits.Commit{
+		{Type: commits.Type_feat, Subject: "add feature"},
+	}
+
+	output, err := GenerateReleaseNotes("2.0.0", "", commitList)
+	if err != nil {
+		t.Fatalf("GenerateReleaseNotes failed: %v", err)
+	}
+
+	if contains(output, "## Changes") || contains(output, "### [v2.0.0]") || contains(output, "### v2.0.0") {
+		t.Fatalf("unexpected headers in output: %q", output)
+	}
+	if !contains(output, "add feature") {
+		t.Fatalf("missing release note body: %q", output)
+	}
+}
+
 func TestGetDefaultPaths(t *testing.T) {
 	// These should return empty when no files exist
 	cfg := GetDefaultConfigPath()

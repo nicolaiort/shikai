@@ -47,11 +47,11 @@ func TestRunChangelogPrintsCurrentReleaseNotes(t *testing.T) {
 	if stderr != "" {
 		t.Fatalf("expected no stderr, got %q", stderr)
 	}
-	if !strings.Contains(stdout, "## v0.2.0") {
-		t.Fatalf("stdout missing version header: %q", stdout)
-	}
 	if !strings.Contains(stdout, "add feature") || !strings.Contains(stdout, "patch bug") {
 		t.Fatalf("stdout missing changelog entries: %q", stdout)
+	}
+	if strings.Contains(stdout, "## v0.2.0") || strings.Contains(stdout, "## Changes") || strings.Contains(stdout, "### [v") {
+		t.Fatalf("stdout still contains version headers: %q", stdout)
 	}
 }
 

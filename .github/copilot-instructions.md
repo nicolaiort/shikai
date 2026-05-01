@@ -60,7 +60,7 @@ Supporting packages are split by responsibility:
 - `--prerelease` with `--prerelease-id alpha|beta|rc...` appends a prerelease suffix
 - The version chooser is an arrow-key select prompt and should fall back to the recommended bump when stdin/stdout are not terminals
 - Invoke the CLI as `release`; there is no nested `release release` subcommand
-- `shikai changelog` prints the current release changelog to stdout for reuse in release tooling
+- `shikai changelog` prints the current release notes body to stdout for reuse in release tooling
 - The repo is expected to be run from the current working directory
 - Non-conforming commits are ignored rather than coerced
 - If more than one manifest is detected, the command should fail and ask for configuration instead of guessing

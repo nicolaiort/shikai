@@ -34,6 +34,15 @@ func Generate(tag string, templatePath string, commitList []commits.Commit) (str
 	return buf.String(), nil
 }
 
+// GenerateReleaseNotes creates release notes without the version history or version header.
+func GenerateReleaseNotes(tag string, templatePath string, commitList []commits.Commit) (string, error) {
+	content, err := Generate(tag, templatePath, commitList)
+	if err != nil {
+		return "", err
+	}
+	return extractReleaseNotesBody(content), nil
+}
+
 // UpdateFile writes changelog content to a file.
 func UpdateFile(path string, content string) error {
 	if path == "" {
@@ -170,6 +179,57 @@ func generateSimple(tag string, commitList []commits.Commit) string {
 	}
 
 	return builder.String()
+}
+
+func extractReleaseNotesBody(content string) string {
+	lines := strings.Split(content, "\n")
+	start := -1
+	for i, line := range lines {
+		if strings.TrimSpace(line) == "## Changes" {
+			start = i + 1
+			break
+		}
+	}
+
+	if start == -1 {
+		return stripFirstHeading(content)
+	}
+
+	body := lines[start:]
+	for len(body) > 0 && strings.TrimSpace(body[0]) == "" {
+		body = body[1:]
+	}
+	if len(body) > 0 && strings.HasPrefix(strings.TrimSpace(body[0]), "<a name=") {
+		body = body[1:]
+	}
+	if len(body) > 0 && strings.HasPrefix(strings.TrimSpace(body[0]), "### ") {
+		body = body[1:]
+	}
+	for len(body) > 0 && strings.TrimSpace(body[0]) == "" {
+		body = body[1:]
+	}
+	if len(body) > 0 && strings.HasPrefix(strings.TrimSpace(body[0]), "> ") {
+		body = body[1:]
+	}
+	for len(body) > 0 && strings.TrimSpace(body[0]) == "" {
+		body = body[1:]
+	}
+
+	return strings.TrimSpace(strings.Join(body, "\n"))
+}
+
+func stripFirstHeading(content string) string {
+	lines := strings.Split(content, "\n")
+	if len(lines) == 0 {
+		return ""
+	}
+	if strings.HasPrefix(strings.TrimSpace(lines[0]), "## ") {
+		lines = lines[1:]
+	}
+	for len(lines) > 0 && strings.TrimSpace(lines[0]) == "" {
+		lines = lines[1:]
+	}
+	return strings.TrimSpace(strings.Join(lines, "\n"))
 }
 
 func normalizeTagName(tag string) string {

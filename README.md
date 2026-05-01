@@ -46,7 +46,7 @@ Run the CLI from the root of the git repository you want to release:
 shikai
 ```
 
-Generate the current release changelog for stdout:
+Generate the current release notes body for stdout:
 
 ```bash
 shikai changelog > release-notes.md

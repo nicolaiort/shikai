@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/shikai/release/internal/changelog"
 	"github.com/shikai/release/internal/commits"
 	"github.com/shikai/release/internal/git"
 	"github.com/spf13/cobra"
@@ -38,7 +39,7 @@ func runChangelog(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to parse commits: %w", err)
 	}
 
-	changelogContent, err := buildReleaseChangelog(latestTag, viper.GetString("template"), commitList)
+	changelogContent, err := changelog.GenerateReleaseNotes(latestTag, viper.GetString("template"), commitList)
 	if err != nil {
 		return fmt.Errorf("failed to generate changelog: %w", err)
 	}
