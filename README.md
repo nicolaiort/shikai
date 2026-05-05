@@ -52,11 +52,13 @@ You can add an optional `.shikai.yml` file in the repository root to set default
 
 ```yaml
 push: true
+tag-prefix: v
 template: templates/release-changelog.tpl.md
 ```
 
 Any supported settings can be added later without changing the CLI shape, including a custom changelog template path.
 Start from `shikai.sample.yml` in the repo root and copy it to `.shikai.yml`.
+Set `tag-prefix: ""` to create plain semver tags like `1.2.3` instead of `v1.2.3`.
 
 ### Hooks
 
