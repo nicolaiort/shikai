@@ -90,7 +90,18 @@ func TestGenerateReleaseNotesStripsHeaders(t *testing.T) {
 		{Type: commits.Type_feat, Subject: "add feature"},
 	}
 
-	output, err := GenerateReleaseNotes("2.0.0", "v", "", commitList)
+	tmpDir := t.TempDir()
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	defer func() { _ = os.Chdir(oldWD) }()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+
+	missingTemplate := filepath.Join(tmpDir, "missing.tpl.md")
+	output, err := GenerateReleaseNotes("2.0.0", "v", missingTemplate, commitList)
 	if err != nil {
 		t.Fatalf("GenerateReleaseNotes failed: %v", err)
 	}

@@ -7,13 +7,12 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	chglog "github.com/git-chglog/git-chglog"
 	"github.com/nicolaiort/shikai/internal/commits"
 )
-
-const bundledTemplatePath = "templates/release-changelog.tpl.md"
 
 // Generate creates a changelog using the git-chglog Go library.
 func Generate(tag string, tagPrefix string, templatePath string, commitList []commits.Commit) (string, error) {
@@ -90,7 +89,7 @@ func buildGeneratorConfig(tagPrefix string, templateOverride string, nextTag str
 		}
 	}
 	if templatePath == "" {
-		templatePath = bundledTemplatePath
+		templatePath = getBundledTemplatePath()
 	}
 
 	tagFilterPattern := projectCfg.Options.TagFilterPattern
@@ -279,12 +278,25 @@ func GetDefaultConfigPath() string {
 
 // GetDefaultTemplatePath returns the default bundled template path.
 func GetDefaultTemplatePath() string {
-	if _, err := os.Stat(bundledTemplatePath); err == nil {
-		return bundledTemplatePath
+	if path := getBundledTemplatePath(); path != "" {
+		return path
 	}
 	tpl := filepath.Join(".chglog", "CHANGELOG.tpl.md")
 	if _, err := os.Stat(tpl); err == nil {
 		return tpl
+	}
+	return ""
+}
+
+func getBundledTemplatePath() string {
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		return ""
+	}
+	root := filepath.Dir(filepath.Dir(filepath.Dir(file)))
+	path := filepath.Join(root, "templates", "release-changelog.tpl.md")
+	if _, err := os.Stat(path); err == nil {
+		return path
 	}
 	return ""
 }

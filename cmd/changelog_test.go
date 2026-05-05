@@ -9,8 +9,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-
-	"github.com/spf13/viper"
 )
 
 func TestRunChangelogPrintsCurrentReleaseNotes(t *testing.T) {
@@ -57,11 +55,6 @@ func TestRunChangelogPrintsCurrentReleaseNotes(t *testing.T) {
 }
 
 func TestRunChangelogPrintsFullChangelog(t *testing.T) {
-	templatePath, err := filepath.Abs(filepath.Join("..", "templates", "release-changelog.tpl.md"))
-	if err != nil {
-		t.Fatalf("abs template path: %v", err)
-	}
-
 	tmpDir := t.TempDir()
 	initGitRepo(t, tmpDir)
 
@@ -88,9 +81,6 @@ func TestRunChangelogPrintsFullChangelog(t *testing.T) {
 	if err := cmd.Flags().Set("full", "true"); err != nil {
 		t.Fatalf("set full flag: %v", err)
 	}
-	oldTemplate := viper.GetString("template")
-	viper.Set("template", templatePath)
-	defer viper.Set("template", oldTemplate)
 
 	stdout, stderr := captureOutput(t, func() error {
 		return runChangelog(cmd, nil)
