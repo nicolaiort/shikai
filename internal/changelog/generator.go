@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	chglog "github.com/git-chglog/git-chglog"
@@ -15,10 +16,10 @@ import (
 const bundledTemplatePath = "templates/release-changelog.tpl.md"
 
 // Generate creates a changelog using the git-chglog Go library.
-func Generate(tag string, templatePath string, commitList []commits.Commit) (string, error) {
-	tagName := normalizeTagName(tag)
+func Generate(tag string, tagPrefix string, templatePath string, commitList []commits.Commit) (string, error) {
+	tagName := normalizeTagName(tag, tagPrefix)
 
-	cfg, err := buildGeneratorConfig(tagName, templatePath)
+	cfg, err := buildGeneratorConfig(tagName, tagPrefix, templatePath)
 	if err != nil {
 		return generateSimple(tagName, commitList), nil
 	}
@@ -35,8 +36,8 @@ func Generate(tag string, templatePath string, commitList []commits.Commit) (str
 }
 
 // GenerateReleaseNotes creates release notes without the version history or version header.
-func GenerateReleaseNotes(tag string, templatePath string, commitList []commits.Commit) (string, error) {
-	content, err := Generate(tag, templatePath, commitList)
+func GenerateReleaseNotes(tag string, tagPrefix string, templatePath string, commitList []commits.Commit) (string, error) {
+	content, err := Generate(tag, tagPrefix, templatePath, commitList)
 	if err != nil {
 		return "", err
 	}
@@ -56,8 +57,8 @@ func UpdateFile(path string, content string) error {
 	return os.WriteFile(path, []byte(content), 0644)
 }
 
-func buildGeneratorConfig(tag string, templateOverride string) (*chglog.Config, error) {
-	tag = normalizeTagName(tag)
+func buildGeneratorConfig(tag string, tagPrefix string, templateOverride string) (*chglog.Config, error) {
+	tag = normalizeTagName(tag, tagPrefix)
 	projectCfgPath := GetDefaultConfigPath()
 	projectCfg, err := loadProjectConfig(projectCfgPath)
 	if err != nil {
@@ -75,6 +76,15 @@ func buildGeneratorConfig(tag string, templateOverride string) (*chglog.Config, 
 		templatePath = bundledTemplatePath
 	}
 
+	tagFilterPattern := projectCfg.Options.TagFilterPattern
+	if tagFilterPattern == "" {
+		if tagPrefix == "" {
+			tagFilterPattern = "^[0-9]"
+		} else {
+			tagFilterPattern = "^" + regexp.QuoteMeta(tagPrefix)
+		}
+	}
+
 	cfg := &chglog.Config{
 		Bin:        "git",
 		WorkingDir: ".",
@@ -85,7 +95,7 @@ func buildGeneratorConfig(tag string, templateOverride string) (*chglog.Config, 
 		},
 		Options: &chglog.Options{
 			NextTag:               tag,
-			TagFilterPattern:      "^v",
+			TagFilterPattern:      tagFilterPattern,
 			Sort:                  "date",
 			CommitSortBy:          "Scope",
 			CommitGroupBy:         "Type",
@@ -158,7 +168,6 @@ func mergeProjectConfig(cfg *chglog.Config, project projectConfig) {
 }
 
 func generateSimple(tag string, commitList []commits.Commit) string {
-	tag = normalizeTagName(tag)
 	var builder strings.Builder
 	builder.WriteString(fmt.Sprintf("## %s\n\n", tag))
 
@@ -232,11 +241,14 @@ func stripFirstHeading(content string) string {
 	return strings.TrimSpace(strings.Join(lines, "\n"))
 }
 
-func normalizeTagName(tag string) string {
-	if strings.HasPrefix(tag, "v") {
+func normalizeTagName(tag string, prefix string) string {
+	if prefix == "" {
 		return tag
 	}
-	return "v" + tag
+	if strings.HasPrefix(tag, prefix) {
+		return tag
+	}
+	return prefix + tag
 }
 
 // GetDefaultConfigPath returns the git-chglog config path.

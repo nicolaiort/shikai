@@ -59,7 +59,7 @@ func TestGenerateSimple(t *testing.T) {
 		{Type: commits.Type_chore, Subject: "update deps"},
 	}
 
-	output := generateSimple("1.0.0", commitList)
+	output := generateSimple("v1.0.0", commitList)
 
 	// Should contain sections
 	if len(output) == 0 {
@@ -78,7 +78,7 @@ func TestGenerateSimpleWithBreaking(t *testing.T) {
 		{Type: commits.Type_feat, IsBreaking: true, Subject: "breaking change"},
 	}
 
-	output := generateSimple("2.0.0", commitList)
+	output := generateSimple("v2.0.0", commitList)
 
 	if !contains(output, "## v2.0.0") {
 		t.Error("should contain version header")
@@ -90,7 +90,7 @@ func TestGenerateReleaseNotesStripsHeaders(t *testing.T) {
 		{Type: commits.Type_feat, Subject: "add feature"},
 	}
 
-	output, err := GenerateReleaseNotes("2.0.0", "", commitList)
+	output, err := GenerateReleaseNotes("2.0.0", "v", "", commitList)
 	if err != nil {
 		t.Fatalf("GenerateReleaseNotes failed: %v", err)
 	}
@@ -100,6 +100,24 @@ func TestGenerateReleaseNotesStripsHeaders(t *testing.T) {
 	}
 	if !contains(output, "add feature") {
 		t.Fatalf("missing release note body: %q", output)
+	}
+}
+
+func TestGenerateSupportsEmptyPrefix(t *testing.T) {
+	commitList := []commits.Commit{
+		{Type: commits.Type_feat, Subject: "add feature"},
+	}
+
+	output, err := Generate("2.0.0", "", "", commitList)
+	if err != nil {
+		t.Fatalf("Generate failed: %v", err)
+	}
+
+	if contains(output, "v2.0.0") {
+		t.Fatalf("unexpected prefix in output: %q", output)
+	}
+	if !contains(output, "2.0.0") {
+		t.Fatalf("missing unprefixed tag in output: %q", output)
 	}
 }
 

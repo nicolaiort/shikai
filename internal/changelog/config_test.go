@@ -13,7 +13,7 @@ func TestBuildGeneratorConfigUsesTemplateOverride(t *testing.T) {
 		t.Fatalf("write template: %v", err)
 	}
 
-	cfg, err := buildGeneratorConfig("1.2.3", templatePath)
+	cfg, err := buildGeneratorConfig("1.2.3", "v", templatePath)
 	if err != nil {
 		t.Fatalf("buildGeneratorConfig: %v", err)
 	}
@@ -23,6 +23,9 @@ func TestBuildGeneratorConfigUsesTemplateOverride(t *testing.T) {
 	}
 	if cfg.Options.NextTag != "v1.2.3" {
 		t.Fatalf("next tag = %q, want %q", cfg.Options.NextTag, "v1.2.3")
+	}
+	if cfg.Options.TagFilterPattern != "^v" {
+		t.Fatalf("tag filter pattern = %q, want %q", cfg.Options.TagFilterPattern, "^v")
 	}
 	if cfg.Options.HeaderPattern == "" {
 		t.Fatal("expected default header pattern")
@@ -56,7 +59,7 @@ func TestBuildGeneratorConfigLoadsProjectConfig(t *testing.T) {
 		t.Fatalf("chdir: %v", err)
 	}
 
-	cfg, err := buildGeneratorConfig("2.0.0", "")
+	cfg, err := buildGeneratorConfig("2.0.0", "v", "")
 	if err != nil {
 		t.Fatalf("buildGeneratorConfig: %v", err)
 	}
@@ -72,18 +75,34 @@ func TestBuildGeneratorConfigLoadsProjectConfig(t *testing.T) {
 	}
 }
 
+func TestBuildGeneratorConfigSupportsEmptyPrefix(t *testing.T) {
+	cfg, err := buildGeneratorConfig("1.2.3", "", "")
+	if err != nil {
+		t.Fatalf("buildGeneratorConfig: %v", err)
+	}
+
+	if cfg.Options.NextTag != "1.2.3" {
+		t.Fatalf("next tag = %q, want %q", cfg.Options.NextTag, "1.2.3")
+	}
+	if cfg.Options.TagFilterPattern != "^[0-9]" {
+		t.Fatalf("tag filter pattern = %q, want %q", cfg.Options.TagFilterPattern, "^[0-9]")
+	}
+}
+
 func TestNormalizeTagName(t *testing.T) {
 	tests := []struct {
-		tag  string
-		want string
+		tag    string
+		prefix string
+		want   string
 	}{
-		{tag: "1.2.3", want: "v1.2.3"},
-		{tag: "v1.2.3", want: "v1.2.3"},
+		{tag: "1.2.3", prefix: "v", want: "v1.2.3"},
+		{tag: "v1.2.3", prefix: "v", want: "v1.2.3"},
+		{tag: "1.2.3", prefix: "", want: "1.2.3"},
 	}
 
 	for _, tt := range tests {
-		if got := normalizeTagName(tt.tag); got != tt.want {
-			t.Fatalf("normalizeTagName(%q) = %q, want %q", tt.tag, got, tt.want)
+		if got := normalizeTagName(tt.tag, tt.prefix); got != tt.want {
+			t.Fatalf("normalizeTagName(%q, %q) = %q, want %q", tt.tag, tt.prefix, got, tt.want)
 		}
 	}
 }
