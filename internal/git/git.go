@@ -80,7 +80,7 @@ func CommitChanges(message string) error {
 
 // CreateAnnotatedTag creates an annotated git tag with the given message.
 func CreateAnnotatedTag(tag string, message string) error {
-	cmd := exec.Command("git", "tag", "-a", "v"+tag, "-m", message)
+	cmd := exec.Command("git", "tag", "-a", tag, "-m", message)
 	_, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("git tag: %w", err)
@@ -90,7 +90,7 @@ func CreateAnnotatedTag(tag string, message string) error {
 
 // PushTag pushes the tag to the remote origin.
 func PushTag(tag string) error {
-	cmd := exec.Command("git", "push", "origin", "v"+tag)
+	cmd := exec.Command("git", "push", "origin", tag)
 	_, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("git push: %w", err)
@@ -105,7 +105,7 @@ func PushRelease(tag string) error {
 		return err
 	}
 
-	cmd := exec.Command("git", "push", "origin", branch, "v"+tag)
+	cmd := exec.Command("git", "push", "origin", branch, tag)
 	_, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("git push: %w", err)

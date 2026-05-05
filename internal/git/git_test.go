@@ -60,7 +60,7 @@ func TestPushReleasePushesBranchAndTag(t *testing.T) {
 		t.Fatalf("chdir: %v", err)
 	}
 
-	if err := PushRelease("1.2.3"); err != nil {
+	if err := PushRelease("v1.2.3"); err != nil {
 		t.Fatalf("PushRelease: %v", err)
 	}
 
