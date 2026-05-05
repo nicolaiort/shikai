@@ -10,16 +10,24 @@ func TestNormalizeReleaseRefs(t *testing.T) {
 		wantRef     string
 	}{
 		{name: "no tags", latestTag: "", wantVersion: "0.0.0", wantRef: ""},
-		{name: "tag present", latestTag: "v1.2.3", wantVersion: "1.2.3", wantRef: "v1.2.3"},
+		{name: "tag present with default prefix", latestTag: "v1.2.3", wantVersion: "1.2.3", wantRef: "v1.2.3"},
+		{name: "tag present without prefix", latestTag: "1.2.3", wantVersion: "1.2.3", wantRef: "1.2.3"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotVersion, gotRef := normalizeReleaseRefs(tt.latestTag)
+			gotVersion, gotRef := normalizeReleaseRefs(tt.latestTag, "v")
 			if gotVersion != tt.wantVersion || gotRef != tt.wantRef {
-				t.Fatalf("normalizeReleaseRefs(%q) = (%q, %q), want (%q, %q)", tt.latestTag, gotVersion, gotRef, tt.wantVersion, tt.wantRef)
+				t.Fatalf("normalizeReleaseRefs(%q, %q) = (%q, %q), want (%q, %q)", tt.latestTag, "v", gotVersion, gotRef, tt.wantVersion, tt.wantRef)
 			}
 		})
+	}
+}
+
+func TestNormalizeReleaseRefsWithoutPrefix(t *testing.T) {
+	gotVersion, gotRef := normalizeReleaseRefs("1.2.3", "")
+	if gotVersion != "1.2.3" || gotRef != "1.2.3" {
+		t.Fatalf("normalizeReleaseRefs without prefix = (%q, %q), want (%q, %q)", gotVersion, gotRef, "1.2.3", "1.2.3")
 	}
 }
 

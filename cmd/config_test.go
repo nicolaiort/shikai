@@ -119,3 +119,29 @@ func TestLoadConfigReadsTemplate(t *testing.T) {
 		t.Fatalf("template = %q, want %q", got, "templates/release-changelog.tpl.md")
 	}
 }
+
+func TestLoadConfigReadsTagPrefix(t *testing.T) {
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, ".shikai.yml")
+	if err := os.WriteFile(configPath, []byte("tag-prefix: \"\"\n"), 0644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	defer func() { _ = os.Chdir(oldWD) }()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+
+	v := viper.New()
+	v.SetDefault("tag-prefix", "v")
+	if err := loadConfig(v); err != nil {
+		t.Fatalf("loadConfig: %v", err)
+	}
+	if got := v.GetString("tag-prefix"); got != "" {
+		t.Fatalf("tag-prefix = %q, want %q", got, "")
+	}
+}

@@ -17,15 +17,16 @@ import (
 func runRelease(cmd *cobra.Command, args []string) error {
 	dryRun := viper.GetBool("dry-run")
 	hooks := loadReleaseHooks(viper.GetViper())
+	tagPrefix := viper.GetString("tag-prefix")
 
 	// 1. Find current version from latest tag
 	currentVersion, err := git.GetLatestTag()
 	if err != nil {
 		return fmt.Errorf("failed to get latest tag: %w", err)
 	}
-	currentVersion, commitBaseRef := normalizeReleaseRefs(currentVersion)
+	currentVersion, commitBaseRef := normalizeReleaseRefs(currentVersion, tagPrefix)
 	if commitBaseRef == "" {
-		fmt.Println("No existing tags found. Starting from v0.0.0")
+		fmt.Printf("No existing tags found. Starting from %s0.0.0\n", tagPrefix)
 	}
 
 	// 2. Get commits since last tag
@@ -45,13 +46,14 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	versionSelectedByFlag := releaseVersionSelectedByFlag(cmd)
 
 	newVersion := version.Bump(currentVersion, selectedBump)
+	releaseTag := formatReleaseTag(tagPrefix, newVersion)
 
 	// Add prerelease suffix if needed
 	if viper.GetBool("prerelease") {
 		prereleaseID := viper.GetString("prerelease-id")
 		newVersion = version.AddPrerelease(newVersion, prereleaseID)
+		releaseTag = formatReleaseTag(tagPrefix, newVersion)
 	}
-	releaseTag := "v" + newVersion
 
 	if dryRun {
 		previewReleaseHooks(releaseTag, hooks)
@@ -72,7 +74,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	changelogPath := viper.GetString("changelog-path")
 	templatePath := viper.GetString("template")
 
-	changelogContent, err := buildReleaseChangelog(newVersion, templatePath, commitList)
+	changelogContent, err := buildReleaseChangelog(releaseTag, tagPrefix, templatePath, commitList)
 	if err != nil {
 		return fmt.Errorf("failed to generate changelog: %w", err)
 	}
@@ -102,19 +104,19 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	}
 
 	// 9. Commit release changes
-	if err := git.CommitChanges(fmt.Sprintf("chore(release): prepare v%s", newVersion)); err != nil {
+	if err := git.CommitChanges(fmt.Sprintf("chore(release): prepare %s", releaseTag)); err != nil {
 		return fmt.Errorf("failed to commit release changes: %w", err)
 	}
 
 	// 10. Create annotated tag
-	if err := git.CreateAnnotatedTag(newVersion, changelogContent); err != nil {
+	if err := git.CreateAnnotatedTag(releaseTag, changelogContent); err != nil {
 		return fmt.Errorf("failed to create tag: %w", err)
 	}
 	if err := runHookPhase(releaseTag, "after tag creation", hooks.afterTag, false); err != nil {
 		return err
 	}
 
-	fmt.Printf("\n✅ Created tag: v%s\n", newVersion)
+	fmt.Printf("\n✅ Created tag: %s\n", releaseTag)
 	finishRelease := func() error {
 		if err := runHookPhase(releaseTag, "after everything is done", hooks.afterDone, false); err != nil {
 			return err
@@ -133,15 +135,15 @@ func runRelease(cmd *cobra.Command, args []string) error {
 		fmt.Scanln(&response)
 		if response != "y" && response != "Y" {
 			if branch, branchErr := git.GetCurrentBranch(); branchErr == nil {
-				fmt.Printf("Push manually with: git push origin %s v%s\n", branch, newVersion)
+				fmt.Printf("Push manually with: git push origin %s %s\n", branch, releaseTag)
 			} else {
-				fmt.Println("Push manually with: git push origin v" + newVersion)
+				fmt.Println("Push manually with: git push origin " + releaseTag)
 			}
 			return finishRelease()
 		}
 	}
 
-	if err := git.PushRelease(newVersion); err != nil {
+	if err := git.PushRelease(releaseTag); err != nil {
 		return fmt.Errorf("failed to push tag: %w", err)
 	}
 
@@ -149,11 +151,16 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	return finishRelease()
 }
 
-func normalizeReleaseRefs(latestTag string) (string, string) {
+func normalizeReleaseRefs(latestTag string, tagPrefix string) (string, string) {
 	if latestTag == "" {
 		return "0.0.0", ""
 	}
-	version := strings.TrimPrefix(latestTag, "v")
+	version := latestTag
+	if tagPrefix != "" && strings.HasPrefix(latestTag, tagPrefix) {
+		version = strings.TrimPrefix(latestTag, tagPrefix)
+	} else if tagPrefix == "" && strings.HasPrefix(latestTag, "v") {
+		version = strings.TrimPrefix(latestTag, "v")
+	}
 	return version, latestTag
 }
 
@@ -172,6 +179,10 @@ func shouldSkipPush(versionSelectedByFlag, push bool) bool {
 	return versionSelectedByFlag && !push
 }
 
-func buildReleaseChangelog(tag string, templatePath string, commitList []commits.Commit) (string, error) {
-	return changelog.Generate(tag, templatePath, commitList)
+func buildReleaseChangelog(tag string, tagPrefix string, templatePath string, commitList []commits.Commit) (string, error) {
+	return changelog.Generate(tag, tagPrefix, templatePath, commitList)
+}
+
+func formatReleaseTag(tagPrefix string, version string) string {
+	return tagPrefix + version
 }

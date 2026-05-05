@@ -21,6 +21,7 @@ func newChangelogCmd() *cobra.Command {
 }
 
 func runChangelog(cmd *cobra.Command, args []string) error {
+	tagPrefix := viper.GetString("tag-prefix")
 	latestTag, err := git.GetLatestTag()
 	if err != nil {
 		return fmt.Errorf("failed to get latest tag: %w", err)
@@ -39,7 +40,7 @@ func runChangelog(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to parse commits: %w", err)
 	}
 
-	changelogContent, err := changelog.GenerateReleaseNotes(latestTag, viper.GetString("template"), commitList)
+	changelogContent, err := changelog.GenerateReleaseNotes(latestTag, tagPrefix, viper.GetString("template"), commitList)
 	if err != nil {
 		return fmt.Errorf("failed to generate changelog: %w", err)
 	}

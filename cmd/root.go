@@ -22,6 +22,7 @@ func init() {
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		return loadConfig(viper.GetViper())
 	}
+	viper.SetDefault("tag-prefix", "v")
 
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Show what would happen without making changes")
 	viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
