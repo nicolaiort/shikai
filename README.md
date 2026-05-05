@@ -86,10 +86,17 @@ Generate the current release notes body for stdout:
 shikai changelog > release-notes.md
 ```
 
+Print the full changelog for all versions:
+
+```bash
+shikai changelog --full > CHANGELOG.md
+```
+
 Common flags:
 
 - `--patch`, `--minor`, `--major` to pick the version bump directly
 - `--dry-run` to show what would happen without changing anything
+- `--full` to print the full changelog instead of just the latest release notes
 - `--push` to push the tag without prompting
 - `--prerelease` and `--prerelease-id` to create a prerelease tag
 - `--changelog-path` to write the changelog somewhere other than `CHANGELOG.md`

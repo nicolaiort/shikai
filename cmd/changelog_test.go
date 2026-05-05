@@ -10,7 +10,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func TestRunChangelogPrintsCurrentReleaseNotes(t *testing.T) {
@@ -40,8 +40,9 @@ func TestRunChangelogPrintsCurrentReleaseNotes(t *testing.T) {
 		t.Fatalf("chdir: %v", err)
 	}
 
+	cmd := newChangelogCmd()
 	stdout, stderr := captureOutput(t, func() error {
-		return runChangelog(&cobra.Command{}, nil)
+		return runChangelog(cmd, nil)
 	})
 
 	if stderr != "" {
@@ -52,6 +53,57 @@ func TestRunChangelogPrintsCurrentReleaseNotes(t *testing.T) {
 	}
 	if strings.Contains(stdout, "## v0.2.0") || strings.Contains(stdout, "## Changes") || strings.Contains(stdout, "### [v") {
 		t.Fatalf("stdout still contains version headers: %q", stdout)
+	}
+}
+
+func TestRunChangelogPrintsFullChangelog(t *testing.T) {
+	templatePath, err := filepath.Abs(filepath.Join("..", "templates", "release-changelog.tpl.md"))
+	if err != nil {
+		t.Fatalf("abs template path: %v", err)
+	}
+
+	tmpDir := t.TempDir()
+	initGitRepo(t, tmpDir)
+
+	writeFile(t, tmpDir, "README.md", "init")
+	gitCmd(t, tmpDir, "add", "README.md")
+	gitCmd(t, tmpDir, "commit", "-m", "chore: initial commit")
+	gitCmd(t, tmpDir, "tag", "v0.1.0")
+
+	writeFile(t, tmpDir, "feature.txt", "feat")
+	gitCmd(t, tmpDir, "add", "feature.txt")
+	gitCmd(t, tmpDir, "commit", "-m", "feat: add feature")
+	gitCmd(t, tmpDir, "tag", "v0.2.0")
+
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	defer func() { _ = os.Chdir(oldWD) }()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+
+	cmd := newChangelogCmd()
+	if err := cmd.Flags().Set("full", "true"); err != nil {
+		t.Fatalf("set full flag: %v", err)
+	}
+	oldTemplate := viper.GetString("template")
+	viper.Set("template", templatePath)
+	defer viper.Set("template", oldTemplate)
+
+	stdout, stderr := captureOutput(t, func() error {
+		return runChangelog(cmd, nil)
+	})
+
+	if stderr != "" {
+		t.Fatalf("expected no stderr, got %q", stderr)
+	}
+	if !strings.Contains(stdout, "## Changes") || !strings.Contains(stdout, "### [v0.2.0]") {
+		t.Fatalf("stdout missing full changelog headers: %q", stdout)
+	}
+	if !strings.Contains(stdout, "add feature") {
+		t.Fatalf("stdout missing changelog content: %q", stdout)
 	}
 }
 

@@ -11,17 +11,21 @@ import (
 )
 
 func newChangelogCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "changelog",
 		Short: "Print the current release changelog",
-		Long:  "Generate the changelog for the current release and write it to stdout.",
+		Long:  "Generate the current release notes by default, or the full changelog with --full.",
 		Args:  cobra.NoArgs,
 		RunE:  runChangelog,
 	}
+	cmd.Flags().Bool("full", false, "Print the full changelog for all versions")
+	_ = viper.BindPFlag("full", cmd.Flags().Lookup("full"))
+	return cmd
 }
 
 func runChangelog(cmd *cobra.Command, args []string) error {
 	tagPrefix := viper.GetString("tag-prefix")
+	full := viper.GetBool("full")
 	latestTag, err := git.GetLatestTag()
 	if err != nil {
 		return fmt.Errorf("failed to get latest tag: %w", err)
@@ -30,17 +34,22 @@ func runChangelog(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no release tags found")
 	}
 
-	previousTag, err := git.GetPreviousTag(latestTag)
-	if err != nil {
-		return fmt.Errorf("failed to get previous tag: %w", err)
-	}
+	var changelogContent string
+	if full {
+		changelogContent, err = changelog.GenerateFull(tagPrefix, viper.GetString("template"))
+	} else {
+		previousTag, prevErr := git.GetPreviousTag(latestTag)
+		if prevErr != nil {
+			return fmt.Errorf("failed to get previous tag: %w", prevErr)
+		}
 
-	commitList, err := commits.ParseConventionalCommits(previousTag)
-	if err != nil {
-		return fmt.Errorf("failed to parse commits: %w", err)
-	}
+		commitList, parseErr := commits.ParseConventionalCommits(previousTag)
+		if parseErr != nil {
+			return fmt.Errorf("failed to parse commits: %w", parseErr)
+		}
 
-	changelogContent, err := changelog.GenerateReleaseNotes(latestTag, tagPrefix, viper.GetString("template"), commitList)
+		changelogContent, err = changelog.GenerateReleaseNotes(latestTag, tagPrefix, viper.GetString("template"), commitList)
+	}
 	if err != nil {
 		return fmt.Errorf("failed to generate changelog: %w", err)
 	}

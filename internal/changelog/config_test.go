@@ -13,7 +13,7 @@ func TestBuildGeneratorConfigUsesTemplateOverride(t *testing.T) {
 		t.Fatalf("write template: %v", err)
 	}
 
-	cfg, err := buildGeneratorConfig("1.2.3", "v", templatePath)
+	cfg, err := buildGeneratorConfig("v", templatePath, "v1.2.3")
 	if err != nil {
 		t.Fatalf("buildGeneratorConfig: %v", err)
 	}
@@ -59,7 +59,7 @@ func TestBuildGeneratorConfigLoadsProjectConfig(t *testing.T) {
 		t.Fatalf("chdir: %v", err)
 	}
 
-	cfg, err := buildGeneratorConfig("2.0.0", "v", "")
+	cfg, err := buildGeneratorConfig("v", "", "v2.0.0")
 	if err != nil {
 		t.Fatalf("buildGeneratorConfig: %v", err)
 	}
@@ -76,7 +76,7 @@ func TestBuildGeneratorConfigLoadsProjectConfig(t *testing.T) {
 }
 
 func TestBuildGeneratorConfigSupportsEmptyPrefix(t *testing.T) {
-	cfg, err := buildGeneratorConfig("1.2.3", "", "")
+	cfg, err := buildGeneratorConfig("", "", "1.2.3")
 	if err != nil {
 		t.Fatalf("buildGeneratorConfig: %v", err)
 	}

@@ -19,7 +19,7 @@ const bundledTemplatePath = "templates/release-changelog.tpl.md"
 func Generate(tag string, tagPrefix string, templatePath string, commitList []commits.Commit) (string, error) {
 	tagName := normalizeTagName(tag, tagPrefix)
 
-	cfg, err := buildGeneratorConfig(tagName, tagPrefix, templatePath)
+	cfg, err := buildGeneratorConfig(tagPrefix, templatePath, tagName)
 	if err != nil {
 		return generateSimple(tagName, commitList), nil
 	}
@@ -30,6 +30,24 @@ func Generate(tag string, tagPrefix string, templatePath string, commitList []co
 	var buf bytes.Buffer
 	if err := gen.Generate(&buf, ""); err != nil {
 		return generateSimple(tagName, commitList), nil
+	}
+
+	return buf.String(), nil
+}
+
+// GenerateFull creates a changelog with all tagged versions.
+func GenerateFull(tagPrefix string, templatePath string) (string, error) {
+	cfg, err := buildGeneratorConfig(tagPrefix, templatePath, "")
+	if err != nil {
+		return "", err
+	}
+
+	logger := chglog.NewLogger(io.Discard, io.Discard, true, true)
+	gen := chglog.NewGenerator(logger, cfg)
+
+	var buf bytes.Buffer
+	if err := gen.Generate(&buf, ""); err != nil {
+		return "", err
 	}
 
 	return buf.String(), nil
@@ -57,8 +75,7 @@ func UpdateFile(path string, content string) error {
 	return os.WriteFile(path, []byte(content), 0644)
 }
 
-func buildGeneratorConfig(tag string, tagPrefix string, templateOverride string) (*chglog.Config, error) {
-	tag = normalizeTagName(tag, tagPrefix)
+func buildGeneratorConfig(tagPrefix string, templateOverride string, nextTag string) (*chglog.Config, error) {
 	projectCfgPath := GetDefaultConfigPath()
 	projectCfg, err := loadProjectConfig(projectCfgPath)
 	if err != nil {
@@ -94,7 +111,7 @@ func buildGeneratorConfig(tag string, tagPrefix string, templateOverride string)
 			RepositoryURL: projectCfg.Info.RepositoryURL,
 		},
 		Options: &chglog.Options{
-			NextTag:               tag,
+			NextTag:               nextTag,
 			TagFilterPattern:      tagFilterPattern,
 			Sort:                  "date",
 			CommitSortBy:          "Scope",
