@@ -56,7 +56,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 	}
 
 	if dryRun {
-		fmt.Printf("[DRY RUN] Would release %s → %s\n", currentVersion, newVersion)
+		fmt.Printf("[DRY RUN] Would release %s → %s (tag %s)\n", currentVersion, newVersion, releaseTag)
 		previewReleaseHooks(releaseTag, hooks)
 		fmt.Println("\n[DRY RUN] Skipping actual release creation")
 		return nil
