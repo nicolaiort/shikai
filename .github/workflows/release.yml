@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   build:
@@ -72,6 +73,11 @@ jobs:
         with:
           path: dist
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
       - name: Create release and upload assets
         env:
           GH_TOKEN: ${{ github.token }}
@@ -97,3 +103,12 @@ jobs:
           done < <(find dist -type f \( -name 'shikai' -o -name 'shikai.exe' \) -print0)
 
           gh release upload "${TAG}" "${staging_dir}"/* --clobber
+
+      - name: Publish to npm
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          npm version "${version}" --no-git-tag-version --allow-same-version
+          npm publish --provenance --access public

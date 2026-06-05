@@ -1,0 +1,44 @@
+{
+  "name": "@nicolaiort/shikai",
+  "version": "1.3.1",
+  "description": "A Conventional Commits-based release CLI",
+  "bin": {
+    "shikai": "bin/cli.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js",
+    "publish": "npm publish --access public"
+  },
+  "files": [
+    "bin/",
+    "install.js",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicolaiort/shikai.git"
+  },
+  "keywords": [
+    "release",
+    "cli",
+    "conventional-commits",
+    "semver",
+    "changelog"
+  ],
+  "author": "nicolaiort",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nicolaiort/shikai/issues"
+  },
+  "homepage": "https://github.com/nicolaiort/shikai#readme",
+  "os": [
+    "linux",
+    "darwin",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "preferUnplugged": true
+}
