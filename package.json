@@ -6,8 +6,7 @@
     "shikai": "bin/cli.js"
   },
   "scripts": {
-    "postinstall": "node install.js",
-    "publish": "npm publish --access public"
+    "postinstall": "node install.js"
   },
   "files": [
     "bin/",
